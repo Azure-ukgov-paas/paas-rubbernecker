@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Pivotal Story Summaries">
+    <title>Pivotal Summary Viewer</title>
+    <link rel="apple-touch-icon" sizes="57x57" href="images/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="images/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="images/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="images/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="images/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="images/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">    
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/rubbernecker.css">
+
+</head>
+<body>
+
+<div class="update bg-danger" style="display: none;">
+    <p>
+        Your board may be slightly out of date. The page will be refreshed, in <span>30</span> seconds.
+        <a href="#" data-trigger="refresh">Refresh</a>
+        <a href="#" data-trigger="cancel">Cancel</a>
+    </p>
+</div>
+
+<div class="options clearfix">
+    <label>
+        Team:
+        <div class="btn-group team-switch" role="group">
+            <a href="#" class="btn btn-sm btn-default" data-switch="team" data-value="a" data-target=".story[class*='team-']" data-hide=".team-B">A</a>
+            <a href="#" class="btn btn-sm btn-default active" data-switch="team" data-value="neutral" data-target=".story[class*='team-']">Neutral</a>
+            <a href="#" class="btn btn-sm btn-default" data-switch="team" data-value="b" data-target=".story[class*='team-']" data-hide=".team-A">B</a>
+        </div>
+    </label>
+
+    <label>
+        Neutral:
+        <div class="btn-group neutral-switch" role="group">
+            <a href="#" class="btn btn-sm btn-default active" data-switch="neutral" data-value="show" data-target=".story.neutral">Show</a>
+            <a href="#" class="btn btn-sm btn-default" data-switch="neutral" data-value="hide" data-target=".story.neutral" data-hide=".neutral">Hide</a>
+        </div>
+    </label>
+
+    <label>
+        Updates:
+        <div class="btn-group updates-switch" role="group">
+            <a href="#" class="btn btn-sm btn-default active" data-switch="updates" data-value="on">On</a>
+            <a href="#" class="btn btn-sm btn-default" data-switch="updates" data-value="off">Off</a>
+        </div>
+    </label>
+
+    <a href="#" class="glyphicon glyphicon-cog handler"></a>
+</div>
+
+<div class="container-fluid" role="main">
+    <div class="row">
+        <% colclass = rejectedStory.length > 0 ? "col-md-3" : "col-md-4" %>
+        <div class="<%= colclass %>">
+            <h2>Doing <small><%= story.length %></small></h2>
+
+            <% story.forEach(function(story) { %>
+                <%- include('story/summary', {
+                    story: story,
+                    status: "started",
+                    message: "In Progress",
+                    overLimit: false
+                }); %>
+            <% }); %>
+        </div>
+
+        <div class="<%= colclass %>">
+            <h2>
+                Reviewing
+                <small class="<%= reviewSlotsFull ? 'text-danger' : '' %>">
+                    <%= finishedStory.length %>/<%= reviewSlotsLimit %>
+                </small>
+            </h2>
+
+            <% finishedStory.forEach(function(story, key) { %>
+                <%- include('story/summary', {
+                    story: story,
+                    status: "finished",
+                    message: "In Review",
+                    overLimit: reviewSlotsLimit < (key + 1)
+                }); %>
+            <% }); %>
+        </div>
+
+        <div class="<%= colclass %>">
+            <h2>
+                Approving
+                <small class="<%= approveSlotsFull ? 'text-danger' : '' %>">
+                    <%= deliveredStory.length %>/<%= approveSlotsLimit %>
+                </small>
+            </h2>
+
+            <% deliveredStory.forEach(function(story, key) { %>
+                <%- include('story/summary', {
+                    story: story,
+                    status: "delivered",
+                    message: "In Approving",
+                    overLimit: approveSlotsLimit < (key + 1)
+                }); %>
+            <% }); %>
+        </div>
+
+        <% if (rejectedStory.length > 0) { %>
+        <div class="<%= colclass %>">
+            <h2>Rejected <small><%= rejectedStory.length %></small></h2>
+
+            <% rejectedStory.forEach(function(story) { %>
+                <%- include('story/summary', {
+                    story: story,
+                    status: "rejected",
+                    message: "Rejected",
+                    overLimit: false
+                }); %>
+            <% }); %>
+        </div>
+        <% } %>
+    </div>
+
+    <footer class="footer">
+        <p class="text-center">
+            <a href="https://www.pivotaltracker.com/n/projects/<%= projectId %>" target="_blank">
+                Full Fat Pivotal Buzz
+            </a>
+        </p>
+    </footer>
+</div><!-- /container -->
+
+<!-- I am terribly sorry for this... Really, really sorry... - Rafal -->
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/rubbernecker.js"></script>
+<script>
+    var currentState = '<%= currentState %>';
+</script>
+</body>
+</html>

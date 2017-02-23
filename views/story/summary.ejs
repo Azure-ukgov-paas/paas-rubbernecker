@@ -1,0 +1,103 @@
+<div class="story <%= story.team ? 'team-' + story.team : 'neutral' %>">
+    <div class="panel panel-<%= status %>">
+        <div class="panel-heading">
+            <span class="days">
+                ► <%= story.daysInProgress %> day<% if (story.daysInProgress != 1) { %>s<% } %>
+            </span>
+            <h3 class="panel-title">
+                <a href="https://www.pivotaltracker.com/story/show/<%= story.id %>" target="_blank">
+                    <%= story.name %>
+                </a>
+            </h3>
+        </div>
+
+        <div class="panel-body">
+            <% if (story.workers.length === 0) { %>
+                <h4 class="text-danger">
+                    <% if (story.workers.length === 0) { %>
+                        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                    <% } %>
+                    Nobody is working on this
+
+                    <br>
+                    <small>Sad times.</small>
+                </h4>
+            <% } %>
+
+            <% if (story.workers.length > 0) { %>
+                <div>
+                    <h4>Assignee<%= story.workers.length != 1 ? "s" : "" %></h4>
+                    <p><%= story.workers.join(", "); %></p>
+                </div>
+            <% } %>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <a href="#<%= story.id %>-info" data-toggle="collapse" aria-expanded="false" aria-controls="<%= story.id %>-info">
+                        More info
+                    </a>
+                </div>
+                <div class="col-md-6 text-right">
+                    <% if (story.team) { %>
+                        Team: <strong><%= story.team %></strong>
+                    <% } %>
+                </div>
+            </div>
+
+            <div id="<%= story.id %>-info" class="collapse">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Status</th>
+                        <td><%= message %></td>
+                    </tr>
+                    <tr>
+                        <th>Requester</th>
+                        <td><%= story.signOffBy %></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="panel-footer <%= story.isBlocked || story.hasComments || overLimit ? '' :'hidden' %>">
+            <% if (overLimit) { %>
+                <div class="row">
+                    <div class="col-sm-2 sticker">
+                        <img src="/images/sad_panda.gif" alt="Sad Panda" class="img-circle">
+                    </div>
+
+                    <div class="col-sm-10 description">
+                        I am a sad panda.<br/>
+                        I will never find any slots for <%= status == 'finished' ? 'review' : 'acceptance' %>.
+                    </div>
+                </div>
+            <% } %>
+
+            <% if (story.isBlocked) { %>
+                <div class="row">
+                    <div class="col-sm-2 sticker">
+                        <img src="/images/blocked.svg" alt="Story Blocked" class="img-circle">
+                    </div>
+
+                    <div class="col-sm-10 description">
+                        Blocked!<br/>
+                        Does any body work around here?
+                    </div>
+                </div>
+            <% } %>
+
+            <% if (story.hasComments) { %>
+                <div class="row">
+                    <div class="col-sm-2 sticker">
+                        <img src="/images/comments.svg" alt="Story has Comments to Resolve" class="img-circle">
+                    </div>
+
+                    <div class="col-sm-10 description">
+                        Has comments to resolve<br/>
+                        Or maybe I just haven't check for a while...
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
